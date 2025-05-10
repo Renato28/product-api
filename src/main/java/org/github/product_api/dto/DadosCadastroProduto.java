@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  * @param preco O preço do produto
  * @param descricao A descrição do produto
  */
-public record ProdutoDto(
+public record DadosCadastroProduto(
         Integer id,
         
         @NotBlank(message = "O nome do produto é obrigatório")
@@ -31,7 +31,7 @@ public record ProdutoDto(
     /**
      * Construtor secundário sem ID para cadastro
      */
-    public ProdutoDto(String nome, BigDecimal preco, String descricao) {
+    public DadosCadastroProduto(String nome, BigDecimal preco, String descricao) {
         this(null, nome, preco, descricao);
     }
 
