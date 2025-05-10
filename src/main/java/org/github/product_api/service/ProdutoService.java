@@ -1,8 +1,9 @@
 package org.github.product_api.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.github.product_api.dto.ProdutoDto;
+import org.github.product_api.dto.DadosAtualizacaoProduto;
+import org.github.product_api.dto.DadosCadastroProduto;
+import org.github.product_api.dto.DadosListarProduto;
 import org.github.product_api.exceptions.ProdutoNotFoundException;
 import org.github.product_api.model.Produto;
 import org.github.product_api.repository.ProdutoRepository;
@@ -16,62 +17,39 @@ import java.util.stream.Collectors;
 public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
+    private static final String PRODUCT_NOT_FOUND_EXCEPTION = "Produto não encontrado";
 
-    private static final String PRODUTO_NOT_FOUND_EXCEPTION = "Produto não encontrado";
-
-    @Transactional
-    public Produto cadastrar(ProdutoDto produtoDto) {
-        Produto produto = toEntity(ProdutoDto);
-        Produto produtoSalvo = produtoRepository.save.(produto);
-        return produtoRepository.save(produto);
-    }
-
-    @Transactional
-    public void atualizar(Integer id, Produto produto) {
-        Produto p = produtoRepository.
-                findById(id)
-                .orElseThrow(() ->
-                        new ProdutoNotFoundException(PRODUTO_NOT_FOUND_EXCEPTION));
-        p.setNome(produto.getNome());
-        p.setPreco(produto.getPreco());
-        p.setDescricao(produto.getDescricao());
+    public void cadastrar(DadosCadastroProduto dados) {
+        var produto = new Produto(dados);
         produtoRepository.save(produto);
-
-        Produto produtoAtualizado = produtoRepository.save(produtoExiste);
-        return toDto(produtoAtualizado);
     }
 
-    public List<Produto> listar() {
-        return produtoRepository.findAll();
-        .tream()
-        .map(this::toDto)
-        .collect(collectors.tolist());
+    public void atualizar(Integer id, DadosAtualizacaoProduto dados) {
+        Produto produto = produtoRepository.findById(id).orElseThrow(()
+                -> new ProdutoNotFoundException(PRODUCT_NOT_FOUND_EXCEPTION));
+        produto.atualizarProduto(dados);
+        produtoRepository.save(produto);
+    }
+
+    public List<DadosListarProduto> listar() {
+        return produtoRepository.findAll()
+                .stream()
+                .map(DadosListarProduto::new)
+                .collect(Collectors.toList());
     }
 
     public void excluir(Integer id) {
-        Produto produto = produtoRepository.findById(id).orElseThrow(() ->
-                new ProdutoNotFoundException(PRODUTO_NOT_FOUND_EXCEPTION));
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNotFoundException(PRODUCT_NOT_FOUND_EXCEPTION));
         produtoRepository.delete(produto);
-  {
-  public ProdutoDto buscarPorId(Integer id) {
-     Produto produto = produtoRepository.findById(id)
-             .orElseThrow(() -> new ProdutoNotFoundException(PRODUTO_NOT_FOUND_EXCEPTION));
-      return toDto(produto);
-  }
-  // Métodos auxiliares para converssão
-  private Produto toEntity(ProdutoDto dto) {
-      Produto produto = new Produto();
-      Produto.setNome(dto.nome());
-      produto.setPreco(dto.preco());
-      produto.setDescricao(dto.descricao());
-      neturn produto;
- }
+    }
 
- private ProdutoDto toDto(Produto entity) {
-     return new ProdutoDto(
-         entity.getNome(),
-         entity.getPreco(),
-         entity.getDescricao()
-    );
- }
+    public DadosListarProduto buscarPorId(Integer id) {
+        return produtoRepository
+                .findById(id).stream()
+                .map(DadosListarProduto::new)
+                .findFirst()
+                .orElseThrow(() ->
+                        new ProdutoNotFoundException(PRODUCT_NOT_FOUND_EXCEPTION));
+    }
 }

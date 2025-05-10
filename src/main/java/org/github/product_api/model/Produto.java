@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.github.product_api.dto.DadosAtualizacaoProduto;
+import org.github.product_api.dto.DadosCadastroProduto;
 
 import java.math.BigDecimal;
 
@@ -26,4 +28,23 @@ public class Produto {
 
     private String descricao;
 
+    public Produto(DadosCadastroProduto dados) {
+        this.nome = dados.nome();
+        this.preco = dados.preco();
+        this.descricao = dados.descricao();
+    }
+
+    public void atualizarProduto(DadosAtualizacaoProduto dados) {
+        if (dados.nome() != null) {
+            this.nome = dados.nome();
+        }
+
+        if (dados.preco() != null) {
+            this.preco = dados.preco();
+        }
+
+        if (dados.descricao() != null) {
+            this.descricao = dados.descricao();
+        }
+    }
 }

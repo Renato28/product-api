@@ -2,6 +2,9 @@ package org.github.product_api.controller;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.github.product_api.dto.DadosAtualizacaoProduto;
+import org.github.product_api.dto.DadosCadastroProduto;
+import org.github.product_api.dto.DadosListarProduto;
 import org.github.product_api.model.Produto;
 import org.github.product_api.service.ProdutoService;
 import org.springframework.http.HttpStatus;
@@ -20,22 +23,22 @@ public class ProdutoController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<Produto> cadastrar(@RequestBody Produto produto) {
-        Produto novoProduto = produtoService.cadastrar(produto);
-        URI location = URI.create("/produtos/" + novoProduto.getId());
-        return ResponseEntity.created(location).body(novoProduto);
+    public ResponseEntity<Void> cadastrar(@RequestBody DadosCadastroProduto dados) {
+        produtoService.cadastrar(dados);
+        URI location = URI.create("/produtos/" + dados.id());
+        return ResponseEntity.created(location).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping
-    public ResponseEntity<Void> atualizar(@NotNull Integer id, @RequestBody Produto produto) {
-        produtoService.atualizar(id, produto);
+    public ResponseEntity<Void> atualizar(@NotNull Integer id, @RequestBody DadosAtualizacaoProduto dados) {
+        produtoService.atualizar(id, dados);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Produto>> listar() {
-        List<Produto> produtos = produtoService.listar();
+    public ResponseEntity<List<DadosListarProduto>> listar() {
+        List<DadosListarProduto> produtos = produtoService.listar();
         return ResponseEntity.ok(produtos);
     }
 
@@ -43,5 +46,11 @@ public class ProdutoController {
     public ResponseEntity<Void> excluir(@NotNull Integer id) {
         produtoService.excluir(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DadosListarProduto> buscarPorId(@NotNull @PathVariable Integer id) {
+        DadosListarProduto produto = produtoService.buscarPorId(id);
+        return ResponseEntity.ok().body(produto);
     }
 }
