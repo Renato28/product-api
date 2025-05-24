@@ -25,15 +25,14 @@ public class ProdutoService {
     }
 
     public void atualizar(Integer id, DadosAtualizacaoProduto dados) {
-        Produto produto = produtoRepository.findById(id).orElseThrow(()
-                -> new ProdutoNotFoundException(PRODUCT_NOT_FOUND_EXCEPTION));
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNotFoundException(PRODUCT_NOT_FOUND_EXCEPTION));
         produto.atualizarProduto(dados);
         produtoRepository.save(produto);
     }
 
     public List<DadosListarProduto> listar() {
-        return produtoRepository.findAll()
-                .stream()
+        return produtoRepository.findAll().stream()
                 .map(DadosListarProduto::new)
                 .collect(Collectors.toList());
     }
@@ -45,11 +44,29 @@ public class ProdutoService {
     }
 
     public DadosListarProduto buscarPorId(Integer id) {
-        return produtoRepository
-                .findById(id).stream()
+        return produtoRepository.findById(id).stream()
                 .map(DadosListarProduto::new)
                 .findFirst()
-                .orElseThrow(() ->
-                        new ProdutoNotFoundException(PRODUCT_NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new ProdutoNotFoundException(PRODUCT_NOT_FOUND_EXCEPTION));
+    }
+
+    /**
+     * Busca produtos pelo nome (contendo o termo, ignorando maiúsculas/minúsculas).
+     *
+     * @param nome parte do nome do produto
+     * @return lista de produtos encontrados
+     * @throws ProdutoNotFoundException se nenhum produto for encontrado
+     */
+    public List<DadosListarProduto> buscarPorNome(String nome) {
+        List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCase(nome);
+
+        if (produtos.isEmpty()) {
+            throw new ProdutoNotFoundException(PRODUCT_NOT_FOUND_EXCEPTION);
+        }
+
+        return produtos.stream()
+                .map(DadosListarProduto::new)
+                .collect(Collectors.toList());
     }
 }
+
